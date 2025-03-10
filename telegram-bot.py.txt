@@ -1,0 +1,122 @@
+import requests
+import re
+import time
+import os
+import sys
+import json
+import socket
+import logging
+from multiprocessing import Pool
+from rich import print as cetak
+from pystyle import Colors, Colorate, Write
+from rich.panel import Panel as nel
+from colorama import Fore, Style, init
+from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+ua1 = {'User-Agent' UserAgent().random}
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+init(autoreset=True)
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Telegram Bot Token
+TELEGRAM_BOT_TOKEN = '7930707404:AAE75qswmw1aRZgSspXluPO_THbcfrMYd8A'
+
+red = Fore.RED
+cyan = Fore.CYAN
+green = Fore.GREEN 
+yellow = Fore.YELLOW
+white = Fore.WHITE
+
+def clear_console()
+    if sys.platform.startswith('linux')
+        os.system('clear')
+    elif sys.platform.startswith('freebsd')
+        os.system('clear')
+    else
+        os.system('cls')
+
+def display_intro(update Update, context CallbackContext)
+    Write.Print(─══════════════════════════ቐቐ══════════════════════════─n, Colors.blue_to_purple, interval=0.01)
+    text = f 
+ $$$$$$$$$$$$   $$$$ $$$$$$$$$$$$
+ $$$$   $$$$    $$$$ $$$$    $$$$
+ $$$$$$$$$$$$   $$$$ $$$$
+ $$$$      $$$$ $$$$ $$$$$$$$$$$$
+ $$$$      $$$$ $$$$ $$$$    $$$$
+ $$$$      $$$$ $$$$ $$$$    $$$$
+ $$$$$$$$$$$$$$ $$$$ $$$$$$$$$$$$
+__  ___________  ______ __     
+
+# CREATED BY  t.menisofganz2
+
+    for N, line in enumerate(text.split(n))
+        print(Colorate.Horizontal(Colors.red_to_green, line, 1))
+        time.sleep(0.05)
+    Write.Print(n─══════════════════════════ቐቐ══════════════════════════─nn, Colors.blue_to_purple, interval=0.01)
+    update.message.reply_text(text)
+
+def check_domains(update Update, context CallbackContext)
+    try
+        id_telegram = update.message.chat_id
+        domain_list = [line.strip() for line in update.message.text.split() if line.strip()]  # Get domain list from message
+        result_directory = os.path.join('results', 'CheckNawala')
+        os.makedirs(result_directory, exist_ok=True)
+
+        for domain in domain_list
+            try
+                ip_address = socket.gethostbyname(domain)
+                domain = f'http{re.sub(rhttps, , domain)}'
+                csrf = re.findall(r'name=csrf_token value=(.)', requests.get('httpstrustpositif.kominfo.go.id', headers={'User-Agent' UserAgent().random}, verify=False).content.decode(utf-8))[0]
+                response = requests.post('httpstrustpositif.kominfo.go.idRest_servergetrecordsname_home', data={'csrf_token' csrf, 'name' domain}, headers={'User-Agent' UserAgent().random}, verify=False, timeout=15).content.decode(utf-8)
+                status = json.loads(response)['values'][0]['Status']
+                
+                if status == 'Ada'
+                    logging.info(f'{yellow}- {white}{domain} {yellow} {red}[ FOUND NAWALA! ]')
+                    with open(os.path.join(result_directory, 'found_nawala.txt'), a+) as file
+                        file.write(f'https{domain}n')
+                    update.message.reply_text(f'Domain {domain}nIP {ip_address}nFound Nawala!')
+                else
+                    logging.info(f'{yellow}- {white}{domain} {yellow} {green}[ AMAN! ]')
+                    update.message.reply_text(f'Domain {domain}nIP {ip_address}nAman!')
+            except Exception as e
+                logging.error(fError processing {domain} {e})
+                update.message.reply_text(fError processing {domain} {e})
+    except Exception as e
+        logging.error(fAn error occurred {e})
+        update.message.reply_text(fAn error occurred {e})
+
+def start(update Update, context CallbackContext)
+    update.message.reply_text(Welcome! Send me a list of domains to check.)
+
+def main()
+    # Set up the Updater
+    updater = Updater(TELEGRAM_BOT_TOKEN, use_context=True)
+
+    # Get the dispatcher to register handlers
+    dp = updater.dispatcher
+
+    # on different commands - answer in Telegram
+    dp.add_handler(CommandHandler(start, start))
+    dp.add_handler(CommandHandler(intro, display_intro))
+
+    # on noncommand i.e message - check domains
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, check_domains))
+
+    # Start the Bot
+    updater.start_polling()
+
+    # Run the bot until you press Ctrl-C or the process receives SIGINT, SIGTERM or SIGABRT
+    updater.idle()
+
+if __name__ == __main__
+    try
+        main()
+    except Exception as e
+        logging.error(fAn error occurred in main {e})
